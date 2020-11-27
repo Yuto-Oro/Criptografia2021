@@ -317,11 +317,11 @@ def main():
 	cipherTimeRsaOaep, decipherTimeRsaOaep, finalTimeRsaPss, verifyingTimeRsaPss = [],[],[],[]
 
 	print("Generating test vectors for AES-ECB...")
-	timeAesEcb, dTimeAesEcb = AES_ECB(AesVectorInput("vectores_AES.txt"),0)
+	timeAesEcb, dTimeAesEcb = AES_ECB(AesVectorInput("testVectorsAES256.txt"),0)
 	avgAesEcb, decipherAvgAesEcb = averageRuntime("cryp", timeAesEcb, dTimeAesEcb)
 
 	print("Generating test vectors for AES-CBC...")
-	timeAesCbc, dTimeAesCbc = AES_CBC(AesVectorInput("vectores_AES.txt"),0)
+	timeAesCbc, dTimeAesCbc = AES_CBC(AesVectorInput("testVectorsAES256.txt"),0)
 	avgAesCbc, decipherAvgAesCcb = averageRuntime("cryp", timeAesCbc, dTimeAesCbc)
 
 	print("Generating test vectors for RSA-OAEP...")
@@ -332,16 +332,16 @@ def main():
 	cipherAvgRsaOaep, decipherAvgRsaOaep = averageRuntime("cryp", cipherTimeRsaOaep, decipherTimeRsaOaep)
 
 	print("Generating test vectors for SHA384...")
-	sha384time = shaAlgorithms(1,"vectores_hash.txt",1024)
+	sha384time = shaAlgorithms(1,"testVectorsSHA384.txt",1024)
 	avgSha384 = averageRuntime("hash",sha384time,0)
 	print("Generating test vectors for SHA512...")
-	sha512time = shaAlgorithms(2,"vectores_hash.txt",1024)
+	sha512time = shaAlgorithms(2,"testVectorsSHA512.txt",1024)
 	avgSha512 = averageRuntime("hash",sha512time,0)
 	print("Generating test vectors for SHA3_384...")
-	sha3_384time = shaAlgorithms(3,"vectores_hash.txt",1024)
+	sha3_384time = shaAlgorithms(3,"testVectorsSHA384.txt",1024)
 	avgSha3_384 = averageRuntime("hash",sha3_384time,0)
 	print("Generating test vectors for SHA3_512...")
-	sha3_512time = shaAlgorithms(4, "vectores_hash.txt",1024)
+	sha3_512time = shaAlgorithms(4, "testVectorsSHA512.txt",1024)
 	avgSha3_512 = averageRuntime("hash", sha3_512time,0)
 
 	print("Generating test vectors for RSA-PSS...")
@@ -352,11 +352,11 @@ def main():
 	signAvgRsaPss, verifyAvgRsaPss = averageRuntime("cryp", finalTimeRsaPss, verifyingTimeRsaPss)
 
 	print("Generating test vectors for DSA...")
-	finalTimeDSA, verifyingTimeDSA = DSA_alg(DsaVectorInput("vectores_DSA.txt"),0)
+	finalTimeDSA, verifyingTimeDSA = DSA_alg(DsaVectorInput("testVectorsDSA.txt"),0)
 	signAvgDSA, verifyAvgDSA = averageRuntime("cryp", finalTimeDSA, verifyingTimeDSA)
 
 	print("Generating test vectors for ECDSA...")
-	finalTimeECDSA, verifyingTimeECDSA = ecdsa_alg("vectores_ECDSA.txt")
+	finalTimeECDSA, verifyingTimeECDSA = ecdsa_alg("testVectorsECDSA.txt")
 	signAvgECDSA, verifyAvgECDSA = averageRuntime("cryp", finalTimeECDSA, verifyingTimeECDSA)
 
 	table()

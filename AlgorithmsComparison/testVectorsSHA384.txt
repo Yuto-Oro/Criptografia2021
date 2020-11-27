@@ -1,0 +1,64 @@
+********************************************************************************
+*Project NESSIE - New European Schemes for Signature, Integrity, and Encryption*
+********************************************************************************
+
+Primitive Name: Sha-2
+=====================
+Hash size: 384 bits
+
+Test vectors -- set 1
+=====================
+
+Set 1, vector#  0:
+                       message="" (empty string)
+                          hash=38B060A751AC96384CD9327EB1B1E36A
+                               21FDB71114BE07434C0CC7BF63F6E1DA
+                               274EDEBFE76F65FBD51AD2F14898B95B
+
+Set 1, vector#  1:
+                       message="a"
+                          hash=54A59B9F22B0B80880D8427E548B7C23
+                               ABD873486E1F035DCE9CD697E8517503
+                               3CAA88E6D57BC35EFAE0B5AFD3145F31
+
+Set 1, vector#  2:
+                       message="abc"
+                          hash=CB00753F45A35E8BB5A03D699AC65007
+                               272C32AB0EDED1631A8B605A43FF5BED
+                               8086072BA1E7CC2358BAECA134C825A7
+
+Set 1, vector#  3:
+                       message="message digest"
+                          hash=473ED35167EC1F5D8E550368A3DB39BE
+                               54639F828868E9454C239FC8B52E3C61
+                               DBD0D8B4DE1390C256DCBB5D5FD99CD5
+
+Set 1, vector#  4:
+                       message="abcdefghijklmnopqrstuvwxyz"
+                          hash=FEB67349DF3DB6F5924815D6C3DC133F
+                               091809213731FE5C7B5F4999E463479F
+                               F2877F5F2936FA63BB43784B12F3EBB4
+
+Set 1, vector#  5:
+                       message="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
+                          hash=3391FDDDFC8DC7393707A65B1B470939
+                               7CF8B1D162AF05ABFE8F450DE5F36BC6
+                               B0455A8520BC4E6F5FE95B1FE3C8452B
+
+Set 1, vector#  6:
+                       message="A...Za...z0...9"
+                          hash=1761336E3F7CBFE51DEB137F026F89E0
+                               1A448E3B1FAFA64039C1464EE8732F11
+                               A5341A6F41E0C202294736ED64DB1A84
+
+Set 1, vector#  7:
+                       message=8 times "1234567890"
+                          hash=B12932B0627D1C060942F54477641556
+                               55BD4DA0C9AFA6DD9B9EF53129AF1B8F
+                               B0195996D2DE9CA0DF9D821FFEE67026
+
+Set 1, vector#  8:
+                       message=1 million times "a"
+                          hash=9D0E1809716474CB086E834E310A4A1C
+                               ED149E9C00F248527972CEC5704C2A5B
+                               07B8B3DC38ECC4EBAE97DDD87F3D8985
