@@ -1,6 +1,15 @@
 #!usr/bin/env python
 #_*_ coding: utf8 _*_
 
+"""
+Created by:
+			García Francisco Jaime
+			Pichardo Gonzales Jenny Alejandra
+			Ortega Moreno Omar Orlando
+Date:
+			November 27 2020
+"""
+
 import os
 import hashlib
 import time
