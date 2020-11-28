@@ -15,6 +15,9 @@ from Crypto.PublicKey import DSA
 from Crypto.Signature import DSS
 from Crypto.Signature import pss
 from ecdsa import SigningKey, NIST521p
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.backends import default_backend
 
 def AesVectorInput(input_file):
 	lines  = [line.rstrip('\n') for line in open(input_file)]
@@ -243,6 +246,27 @@ def ecdsa_alg(vectores):
 		verificationTime.append(verifyingFinish)
 	return signatureTime, verificationTime
 
+def ecdsaBinary(vectors):
+	signatureTime, verificationTime = [],[]
+	palabras = HashVectorInput(vectors)
+	for i in range(len(palabras)):
+		message = bytearray(palabras[i], 'utf-8')
+		pk = ec.generate_private_key(ec.SECT571K1(), backend=default_backend())
+		signatureStart = time.perf_counter()
+		signature = pk.sign(message, ec.ECDSA(hashes.SHA256()))
+		signatureFinish = time.perf_counter() - signatureStart
+		signatureTime.append(signatureFinish)
+		pubk = pk.public_key()
+		verifyingStart = time.perf_counter()
+		try:
+			assert pubk.verify(signature, message, ec.ECDSA(hashes.SHA256()))
+			print("Authenticated Signature")
+		except:
+			print("Unauthenticated Signature")
+		verifyingFinish = time.perf_counter() - verifyingStart
+		verificationTime.append(verifyingFinish)
+	return signatureTime, verificationTime
+
 def table():
 	print('\n\n\t				      RUNTIME    				')
 	print('\n\t_________________________________________________________________________________')
@@ -253,7 +277,7 @@ def table():
 	for t in range(20):
 		print('\t|      ',str(t).zfill(2),'       |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(timeAesEcb[t],timeAesCbc[t], cipherTimeRsaOaep[t]))
 	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|    Media total  |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(avgAesEcb, avgAesCbc, cipherAvgRsaOaep))
+	print('\t|    Average      |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(avgAesEcb, avgAesCbc, cipherAvgRsaOaep))
 	print('\t|--------------------------------------------------------------------------------|')
 	print('\t| Total vectors analyzed: AES-ECB:',len(timeAesEcb),', AES-CBC:',len(timeAesCbc),', RSA-OAEP: ',len(cipherTimeRsaOaep),'         |')
 	print('\t|________________________________________________________________________________|\n')
@@ -265,7 +289,7 @@ def table():
 	for t in range(20):
 		print('\t|      ',str(t).zfill(2),'       |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(dTimeAesEcb[t],dTimeAesCbc[t], decipherTimeRsaOaep[t]))
 	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|    Media total  |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(decipherAvgAesEcb, decipherAvgAesCcb, decipherAvgRsaOaep))
+	print('\t|    Average      |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(decipherAvgAesEcb, decipherAvgAesCcb, decipherAvgRsaOaep))
 	print('\t|--------------------------------------------------------------------------------|')
 	print('\t| Total vectors analyzed: AES-ECB:',len(dTimeAesEcb),', AES-CBC:',len(dTimeAesCbc),', RSA-OAEP: ',len(decipherTimeRsaOaep),'         |')
 	print('\t|________________________________________________________________________________|\n')
@@ -277,40 +301,41 @@ def table():
 	for t in range(20):
 		print('\t|      ',str(t).zfill(2),'       |      {:0.7f}      |      {:0.7f}      |      {:0.8f}      |      {:0.8f}        |'.format(sha384time[t],sha512time[t], sha3_384time[t], sha3_512time[t]))
 	print('\t|-------------------------------------------------------------------------------------------------------------|')
-	print('\t|    Media total  |      {:0.7f}      |      {:0.7f}      |      {:0.7f}       |      {:0.8f}        |'.format(avgSha384, avgSha512, avgSha3_384, avgSha3_512))
+	print('\t|    Average      |      {:0.7f}      |      {:0.7f}      |      {:0.7f}       |      {:0.8f}        |'.format(avgSha384, avgSha512, avgSha3_384, avgSha3_512))
 	print('\t|-------------------------------------------------------------------------------------------------------------|')
 	print('\t|          Total vectors analyzed: SHA384:',len(sha384time),', SHA512:',len(sha512time),', SHA3_384:',len(sha3_384time),', SHA3_512:',len(sha3_512time),'                 |')
 	print('\t|_____________________________________________________________________________________________________________|\n')
-	print('\n\t_________________________________________________________________________________')
-	print('\t|                             Signing Algorithms                                 |')
-	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|      Vector     |       RSA-PSS      |         DSA        |        ECDSA       |')
-	print('\t|--------------------------------------------------------------------------------|')
+	print('\n\t____________________________________________________________________________________________________________________')
+	print('\t|                                                 Signing Algorithms                                                |')
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
+	print('\t|      Vector     |       RSA-PSS      |         DSA        |        Primal ECDSA       |        Binary ECDSA       |')
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
 	for t in range(7):
-		print('\t|      ',str(t).zfill(2),'       |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(finalTimeRsaPss[t],finalTimeDSA[t], finalTimeECDSA[t]))
-	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|    Media total  |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(signAvgRsaPss, signAvgDSA, signAvgECDSA))
-	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|           Total vectors analyzed: RSA-PSS:',len(finalTimeRsaPss),', DSA:',len(finalTimeRsaPss),', ECDSA:',len(finalTimeECDSA),'              |')
-	print('\t|________________________________________________________________________________|\n')
-	print('\n\t_________________________________________________________________________________')
-	print('\t|                           Signature Verification                               |')
-	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|      Vector     |       RSA-PSS      |         DSA        |        ECDSA       |')
-	print('\t|--------------------------------------------------------------------------------|')
+		print('\t|      ',str(t).zfill(2),'       |      {:0.6f}      |      {:0.6f}      |         {:0.8f}        |      {:0.9f}          |'.format(finalTimeRsaPss[t],finalTimeDSA[t], finalTimeECDSA[t], finalTimeBinSignatureECDSA[t]))
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
+	print('\t|    Average      |      {:0.6f}      |      {:0.6f}      |          {:0.6f}         |        {:0.6f}           |'.format(signAvgRsaPss, signAvgDSA, signAvgECDSA, signatureAverageBinECDSA))
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
+	print('\t|                Total vectors analyzed: RSA-PSS:',len(finalTimeRsaPss),', DSA:',len(finalTimeRsaPss),', Primal ECDSA:',len(finalTimeECDSA),', Binary ECDSA:',len(finalTimeBinSignatureECDSA),'                   |')
+	print('\t|___________________________________________________________________________________________________________________|\n')
+	print('\n\t____________________________________________________________________________________________________________________')
+	print('\t|                                                Signature Verification                                             |')
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
+	print('\t|      Vector     |       RSA-PSS      |         DSA        |        Primal ECDSA       |        Binary ECDSA       |')
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
 	for t in range(7):
-		print('\t|      ',str(t).zfill(2),'       |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(verifyingTimeRsaPss[t],verifyingTimeDSA[t], verifyingTimeECDSA[t]))
-	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|    Media total  |      {:0.6f}      |      {:0.6f}      |      {:0.6f}      |'.format(verifyAvgRsaPss, verifyAvgDSA, verifyAvgECDSA))
-	print('\t|--------------------------------------------------------------------------------|')
-	print('\t|           Total vectors analyzed: RSA-PSS:',len(verifyingTimeRsaPss),', DSA:',len(verifyingTimeRsaPss),', ECDSA:',len(verifyingTimeECDSA),'              |')
-	print('\t|________________________________________________________________________________|\n')
+		print('\t|      ',str(t).zfill(2),'       |      {:0.6f}      |      {:0.6f}      |         {:0.8f}        |         {:0.9f}       |'.format(verifyingTimeRsaPss[t],verifyingTimeDSA[t], verifyingTimeECDSA[t], finalTimeBinVerificationECDSA[t]))
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
+	print('\t|    Average      |      {:0.6f}      |      {:0.6f}      |         {:0.6f}          |          {:0.6f}         |'.format(verifyAvgRsaPss, verifyAvgDSA, verifyAvgECDSA, verifyingAverageBinECDSA))
+	print('\t|-------------------------------------------------------------------------------------------------------------------|')
+	print('\t|                Total vectors analyzed: RSA-PSS:',len(verifyingTimeRsaPss),', DSA:',len(verifyingTimeRsaPss),', Primal ECDSA:',len(verifyingTimeECDSA),', Binary ECDSA:',len(finalTimeBinVerificationECDSA),'                   |')
+	print('\t|___________________________________________________________________________________________________________________|\n')
 	
 
 def main():
 	global timeAesEcb, timeAesCbc, cipherTimeRsaOaep, decipherTimeRsaOaep, dTimeAesEcb, dTimeAesCbc
 	global sha384time, sha512time, sha3_384time, sha3_512time
 	global finalTimeRsaPss, finalTimeDSA, finalTimeECDSA, verifyingTimeRsaPss, verifyingTimeDSA, verifyingTimeECDSA
+	global finalTimeBinSignatureECDSA, finalTimeBinVerificationECDSA, signatureAverageBinECDSA, verifyingAverageBinECDSA
 	global avgAesEcb, avgAesCbc, cipherAvgRsaOaep, decipherAvgAesEcb, decipherAvgAesCcb, decipherAvgRsaOaep
 	global avgSha384, avgSha512, avgSha3_384, avgSha3_512
 	global signAvgRsaPss, signAvgDSA, verifyAvgRsaPss, verifyAvgDSA, signAvgECDSA, verifyAvgECDSA
@@ -355,9 +380,13 @@ def main():
 	finalTimeDSA, verifyingTimeDSA = DSA_alg(DsaVectorInput("testVectorsDSA.txt"),0)
 	signAvgDSA, verifyAvgDSA = averageRuntime("cryp", finalTimeDSA, verifyingTimeDSA)
 
-	print("Generating test vectors for ECDSA...")
+	print("Generating test vectors for primal ECDSA...")
 	finalTimeECDSA, verifyingTimeECDSA = ecdsa_alg("testVectorsECDSA.txt")
 	signAvgECDSA, verifyAvgECDSA = averageRuntime("cryp", finalTimeECDSA, verifyingTimeECDSA)
+
+	print("Generating test vectors for binary ECDSA...")
+	finalTimeBinSignatureECDSA, finalTimeBinVerificationECDSA = ecdsaBinary("testVectorsECDSA.txt")
+	signatureAverageBinECDSA, verifyingAverageBinECDSA = averageRuntime("cryp", finalTimeBinSignatureECDSA, finalTimeBinVerificationECDSA)
 
 	table()
 
